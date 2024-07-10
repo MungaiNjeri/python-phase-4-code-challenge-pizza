@@ -28,7 +28,7 @@ def index():
 @app.route('/restaurants', methods=['GET'])
 def get_restaurants():
     restaurants = Restaurant.query.all()
-    return jsonify([restaurant.to_dict() for restaurant in restaurants])
+    return make_response([restaurant.to_dict(rules=("-restaurant_pizzas",)) for restaurant in restaurants],200)
 
 
 
@@ -44,7 +44,7 @@ def get_restaurant(id):
 @app.route('/pizzas', methods=["GET"])
 def get_pizzas():
     pizzas = Pizza.query.all()
-    return jsonify([pizza.to_dict() for pizza in pizzas])
+    return jsonify([pizza.to_dict(rules=("-restaurant_pizzas",)) for pizza in pizzas])
 # [pizza.to_dict(rules =("restaurant_pizzas")) for pizza in pizzas]
 
 @app.route('/restaurant_pizzas', methods=['POST'])
@@ -64,7 +64,7 @@ def create_restaurant_pizza():
 
 @app.route('/restaurants/<int:id>', methods=['DELETE'])
 def delete_restaurant(id):
-    restaurant = Restaurant.query.get(id)
+    restaurant = Restaurant.query.filter(Restaurant.id==id).first()
     if restaurant:
         db.session.delete(restaurant)
         db.session.commit()
